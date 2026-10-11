@@ -1,4 +1,4 @@
-package com.tasktarckercli;
+package com.tasktrackercli;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
