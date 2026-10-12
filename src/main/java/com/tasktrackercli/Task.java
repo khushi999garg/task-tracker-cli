@@ -11,6 +11,12 @@ public class Task {
         this.status = TaskStatus.TODO;
     }
 
+    public Task(int id, String title, TaskStatus status){
+        this.id = id;
+        this.title = title;
+        this.status = status;
+    }
+
     public int getId() {
         return id;
     }
