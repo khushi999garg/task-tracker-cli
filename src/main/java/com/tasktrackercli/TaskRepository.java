@@ -43,7 +43,7 @@ public class TaskRepository {
             int titleIndex = taskJson.indexOf("\"title\"");
             int titleColonIndex = taskJson.indexOf(":", titleIndex);
             int titleStart = taskJson.indexOf("\"", titleColonIndex);
-            int titleEnd = taskJson.indexOf("\"", titleStart + 1);
+            int titleEnd = findClosingQuote(taskJson, titleStart + 1);
             String title = taskJson.substring(titleStart + 1, titleEnd);
 
             int statusIndex = taskJson.indexOf("\"status\"");
@@ -59,5 +59,63 @@ public class TaskRepository {
         }
 
         return tasks;
+    }
+
+    public void saveTasks(List<Task> tasks) throws IOException {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("[");
+
+        int i = 0;
+
+        for (Task task : tasks) {
+            if (i > 0) {
+                sb.append(",\n");
+            }
+            sb.append("{\"id\": ");
+            sb.append(String.valueOf(task.getId()));
+            sb.append(", \"title\": \"");
+            sb.append(escapeJson(task.getTitle()));
+            sb.append("\", \"status\": \"");
+            sb.append(task.getStatus());
+            sb.append("\"}");
+            i++;
+        }
+
+        sb.append("]");
+
+        // Path filePath = Path.of("tasks.json");
+        File file = new File("tasks.json");
+
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.write(sb.toString());
+        }
+    }
+
+    private String escapeJson(String text) {
+        text = text.replace("\\", "\\\\");
+        text = text.replace("\"", "\\\"");
+        text = text.replace("\n", "\\n");
+        text = text.replace("\t", "\\t");
+        return text;
+    }
+
+    private int findClosingQuote(String text, int start) {
+        int n = text.length();
+        boolean skip = false;
+        for (int i = start; i < n; i++) {
+            if (skip) {
+                skip = false;
+                continue;
+            }
+
+            if (text.charAt(i) == '\\') {
+                skip = true;
+            } else if (text.charAt(i) == '\"') {
+                return i;
+            }
+        }
+
+        return -1;
     }
 }
