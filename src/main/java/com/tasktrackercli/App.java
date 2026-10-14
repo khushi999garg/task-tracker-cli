@@ -1,5 +1,7 @@
 package com.tasktrackercli;
 
+import java.io.IOException;
+
 public class App {
     public static void main(String[] args) {
         if (args.length == 0) {
@@ -7,7 +9,14 @@ public class App {
             return;
         }
 
-        TaskService taskService = new TaskService();
+        TaskService taskService;
+
+        try {
+            taskService = new TaskService();
+        } catch (IOException e) {
+            System.out.println("Error loading tasks: " + e.getMessage());
+            return;
+        }
 
         if (args[0].equals("add")) {
             if (args.length < 2) {

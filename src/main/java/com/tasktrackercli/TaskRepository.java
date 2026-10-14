@@ -33,25 +33,95 @@ public class TaskRepository {
 
         while (objectStart != -1) {
             int objectEnd = content.indexOf("}", objectStart);
+
+            if (objectEnd == -1) {
+                throw new IOException("Invalid JSON: missing closing brace");
+            }
+
             String taskJson = content.substring(objectStart, objectEnd + 1);
 
             int idIndex = taskJson.indexOf("\"id\"");
+
+            if (idIndex == -1) {
+                throw new IOException("Invalid JSON: missing task id");
+            }
+
             int idColonIndex = taskJson.indexOf(":", idIndex);
+
+            if (idColonIndex == -1) {
+                throw new IOException("Invalid JSON");
+            }
+
             int idCommaIndex = taskJson.indexOf(",", idColonIndex);
-            int id = Integer.parseInt(taskJson.substring(idColonIndex + 1, idCommaIndex).trim());
+
+            if (idCommaIndex == -1) {
+                throw new IOException("Invalid JSON");
+            }
+
+            int id;
+
+            try {
+                id = Integer.parseInt(taskJson.substring(idColonIndex + 1, idCommaIndex).trim());
+            } catch (NumberFormatException e) {
+                throw new IOException("Invalid JSON: task id must be an integer");
+            }
 
             int titleIndex = taskJson.indexOf("\"title\"");
+
+            if (titleIndex == -1) {
+                throw new IOException("Invalid JSON: missing task title");
+            }
+
             int titleColonIndex = taskJson.indexOf(":", titleIndex);
+
+            if (titleColonIndex == -1) {
+                throw new IOException("Invalid JSON: malformed task title");
+            }
+
             int titleStart = taskJson.indexOf("\"", titleColonIndex);
+
+            if (titleStart == -1) {
+                throw new IOException("Invalid JSON: malformed task title");
+            }
+
             int titleEnd = findClosingQuote(taskJson, titleStart + 1);
-            String title = taskJson.substring(titleStart + 1, titleEnd);
+
+            if (titleEnd == -1) {
+                throw new IOException("Invalid JSON: missing closing quote in task title");
+            }
+
+            String title = unescapeJson(taskJson.substring(titleStart + 1, titleEnd));
 
             int statusIndex = taskJson.indexOf("\"status\"");
-            int statusColonIndex = taskJson.indexOf(":", statusIndex);
-            int statusStart = taskJson.indexOf("\"", statusColonIndex);
-            int statusEnd = taskJson.indexOf("\"", statusStart + 1);
-            TaskStatus status = TaskStatus.valueOf(taskJson.substring(statusStart + 1, statusEnd));
 
+            if (statusIndex == -1) {
+                throw new IOException("Invalid JSON: missing task status");
+            }
+
+            int statusColonIndex = taskJson.indexOf(":", statusIndex);
+
+            if (statusColonIndex == -1) {
+                throw new IOException("Invalid JSON: malformed task status");
+            }
+
+            int statusStart = taskJson.indexOf("\"", statusColonIndex);
+
+            if (statusStart == -1) {
+                throw new IOException("Invalid JSON: malformed task status");
+            }
+
+            int statusEnd = taskJson.indexOf("\"", statusStart + 1);
+
+            if (statusEnd == -1) {
+                throw new IOException("Invalid JSON: malformed task status");
+            }
+
+            TaskStatus status;
+            try {
+                status = TaskStatus.valueOf(taskJson.substring(statusStart + 1, statusEnd));
+            } catch (IllegalArgumentException e) {
+                throw new IOException("Invalid JSON: unknown task status");
+            }
             Task task = new Task(id, title, status);
             tasks.add(task);
 
@@ -98,6 +168,45 @@ public class TaskRepository {
         text = text.replace("\n", "\\n");
         text = text.replace("\t", "\\t");
         return text;
+    }
+
+    private String unescapeJson(String text) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        boolean skip = false;
+
+        for (int i = 0; i < text.length(); i++) {
+            if (skip) {
+                skip = false;
+                switch (text.charAt(i)) {
+                    case 'n':
+                        sb.append('\n');
+                        break;
+                    case 't':
+                        sb.append('\t');
+                        break;
+                    case '\"':
+                        sb.append('\"');
+                        break;
+                    case '\\':
+                        sb.append('\\');
+                        break;
+                    default:
+                        throw new IOException("Invalid JSON");
+                    // break;
+                }
+            } else {
+                if (text.charAt(i) == '\\') {
+                    skip = true;
+                    if (i == text.length() - 1) {
+                        throw new IOException("Invalid JSON");
+                    }
+                    continue;
+                } else {
+                    sb.append(text.charAt(i));
+                }
+            }
+        }
+        return sb.toString();
     }
 
     private int findClosingQuote(String text, int start) {

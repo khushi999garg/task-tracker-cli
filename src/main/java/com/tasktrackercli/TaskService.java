@@ -1,7 +1,6 @@
 package com.tasktrackercli;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class TaskService {
@@ -9,14 +8,8 @@ public class TaskService {
     private List<Task> tasks;
     private int id = 0;
 
-    public TaskService() {
-        try {
-            tasks = taskRepository.loadTasks();
-        } catch (IOException e) {
-            System.out.println("Error: " + e.getMessage());
-            tasks = new ArrayList<>();
-        }
-
+    public TaskService() throws IOException {
+        tasks = taskRepository.loadTasks();
         initializeNextId();
     }
 
@@ -25,7 +18,7 @@ public class TaskService {
         tasks.add(task);
         try {
             taskRepository.saveTasks(tasks);
-        } catch (IOException e){
+        } catch (IOException e) {
             System.out.println("Error:" + e.getMessage());
         }
         id++;
