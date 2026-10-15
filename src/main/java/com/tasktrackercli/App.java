@@ -22,8 +22,14 @@ public class App {
             if (args.length < 2) {
                 System.out.println("Usage: task add \"task title\"");
             } else {
-                Task task = taskService.addTask(args[1]);
-                System.out.println("Task added: " + task.getTitle() + " (ID: " + task.getId() + ")");
+                Task task;
+                try {
+                    task = taskService.addTask(args[1]);
+                    System.out.println("Task added: " + task.getTitle() + " (ID: " + task.getId() + ")");
+                } catch (IOException e) {
+                    System.out.println("Error adding tasks: " + e.getMessage());
+                    return;
+                }
             }
         } else if (args[0].equals("list")) {
             if (taskService.listTasks().isEmpty()) {
