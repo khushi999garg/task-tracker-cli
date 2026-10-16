@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -155,10 +156,23 @@ public class TaskRepository {
         sb.append("]");
 
         // Path filePath = Path.of("tasks.json");
-        File file = new File("tasks.json");
+        File file = new File("tasks.json.tmp");
 
         try (FileWriter writer = new FileWriter(file)) {
             writer.write(sb.toString());
+        }
+
+        Path src = Path.of("tasks.json.tmp");
+        Path dest = Path.of("tasks.json");
+
+        try {
+            Files.move(src, dest, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        } finally {
+            try {
+                Files.deleteIfExists((src));
+            } catch (IOException e) {
+                System.out.println("Warning: Could not delete temporary file: " + e.getMessage());
+            }
         }
     }
 
