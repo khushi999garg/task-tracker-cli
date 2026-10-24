@@ -67,6 +67,23 @@ public class App {
                 }
                 break;
 
+            case "mark-in-progress":
+                if (args.length != 2) {
+                    System.out.println("Usage: task mark-in-progress <id>");
+                } else {
+                    try {
+                        if (taskService.markTaskInProgress(Integer.parseInt(args[1])))
+                            System.out.println("Task updated: " + TaskStatus.IN_PROGRESS);
+                        else
+                            System.out.println("Task not found");
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid input format. Please enter an integer");
+                    } catch (IOException e) {
+                        System.out.println("Error updating task: " + e.getMessage());
+                    }
+                }
+                break;
+
             case "delete":
                 if (args.length != 2) {
                     System.out.println("Usage: task delete <id>");

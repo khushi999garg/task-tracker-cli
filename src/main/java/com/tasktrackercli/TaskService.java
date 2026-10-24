@@ -21,7 +21,7 @@ public class TaskService {
         taskRepository.saveTasks(list);
         tasks.add(task);
         id++;
-        try { 
+        try {
             taskRepository.saveNextId(id);
         } catch (IOException e) {
             System.out.println("Couldn't update nextID. " + e.getMessage());
@@ -46,14 +46,31 @@ public class TaskService {
         }
     }
 
-    public  boolean updateTask(int taskId, String title) throws IOException {
+    public boolean markTaskInProgress(int taskId) throws IOException {
         int id = findTask(taskId);
 
-        if (id == -1){
-            return  false;
+        if (id == -1) {
+            return false;
         } else {
-            List<Task> list = new  ArrayList<>(tasks);
-            Task task = new  Task(list.get(id).getId(), list.get(id).getTitle(), list.get(id).getStatus());
+            List<Task> list = new ArrayList<>(tasks);
+            Task task = new Task(list.get(id).getId(), list.get(id).getTitle(), list.get(id).getStatus());
+            task.setStatus(TaskStatus.IN_PROGRESS);
+            list.set(id, task);
+            taskRepository.saveTasks(list);
+            tasks.set(id, task);
+
+            return true;
+        }
+    }
+
+    public boolean updateTask(int taskId, String title) throws IOException {
+        int id = findTask(taskId);
+
+        if (id == -1) {
+            return false;
+        } else {
+            List<Task> list = new ArrayList<>(tasks);
+            Task task = new Task(list.get(id).getId(), list.get(id).getTitle(), list.get(id).getStatus());
             task.setTitle(title);
             list.set(id, task);
             taskRepository.saveTasks(list);
