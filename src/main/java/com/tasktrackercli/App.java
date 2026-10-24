@@ -20,7 +20,7 @@ public class App {
 
         switch (args[0]) {
             case "add":
-                if (args.length < 2) {
+                if (args.length != 2) {
                     System.out.println("Usage: task add \"task title\"");
                 } else {
                     Task task;
@@ -35,20 +35,24 @@ public class App {
                 break;
 
             case "list":
-                if (taskService.listTasks().isEmpty()) {
-                    System.out.println("No tasks found.");
+                if (args.length != 1) {
+                    System.out.println("Usage: task list");
                 } else {
-                    String format = "%-5s %-25s %-10s%n";
-                    System.out.format(format, "ID", "TITLE", "STATUS");
-                    for (Task task : taskService.listTasks()) {
-                        System.out.format(format, task.getId(), task.getTitle(), task.getStatus());
+                    if (taskService.listTasks().isEmpty()) {
+                        System.out.println("No tasks found.");
+                    } else {
+                        String format = "%-5s %-25s %-10s%n";
+                        System.out.format(format, "ID", "TITLE", "STATUS");
+                        for (Task task : taskService.listTasks()) {
+                            System.out.format(format, task.getId(), task.getTitle(), task.getStatus());
+                        }
                     }
                 }
                 break;
 
             case "mark-done":
-                if (args.length < 2) {
-                    System.out.println("Usage: task done <id>");
+                if (args.length != 2) {
+                    System.out.println("Usage: task mark-done <id>");
                 } else {
                     try {
                         if (taskService.markTaskDone(Integer.parseInt(args[1])))
@@ -64,7 +68,7 @@ public class App {
                 break;
 
             case "delete":
-                if (args.length < 2) {
+                if (args.length != 2) {
                     System.out.println("Usage: task delete <id>");
                 } else {
                     try {
@@ -76,6 +80,23 @@ public class App {
                         System.out.println("Invalid input format. Please enter an integer");
                     } catch (IOException e) {
                         System.out.println("Error deleting tasks: " + e.getMessage());
+                    }
+                }
+                break;
+
+            case "update":
+                if (args.length != 3) {
+                    System.out.println("Usage: task update <id> \"task title\"");
+                } else {
+                    try {
+                        if (taskService.updateTask(Integer.parseInt(args[1]), args[2]))
+                            System.out.println("Task updated successfully.");
+                        else
+                            System.out.println("Task not found.");
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid input format. Please enter an integer as ID");
+                    } catch (IOException e) {
+                        System.out.println("Error updating task: " + e.getMessage());
                     }
                 }
                 break;

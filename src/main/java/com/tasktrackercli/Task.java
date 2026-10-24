@@ -29,7 +29,10 @@ public class Task {
         return status;
     }
 
+    public void setTitle(String update) {
+        this.title = update;
+    }
     public void setStatus(TaskStatus update) {
-        status = update;
+        this.status = update;
     }
 }
