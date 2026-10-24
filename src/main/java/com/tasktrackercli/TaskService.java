@@ -15,6 +15,7 @@ public class TaskService {
     }
 
     public Task addTask(String title) throws IOException {
+        validateTitle(title);
         List<Task> list = new ArrayList<>(tasks);
         Task task = new Task(id, title);
         list.add(task);
@@ -29,55 +30,12 @@ public class TaskService {
         return task;
     }
 
-    public boolean markTaskDone(int taskId) throws IOException {
-        int id = findTask(taskId);
-
-        if (id == -1) {
-            return false;
-        } else {
-            List<Task> list = new ArrayList<>(tasks);
-            Task task = new Task(list.get(id).getId(), list.get(id).getTitle(), list.get(id).getStatus());
-            task.setStatus(TaskStatus.DONE);
-            list.set(id, task);
-            taskRepository.saveTasks(list);
-            tasks.set(id, task);
-
-            return true;
-        }
-    }
-
-    public boolean markTaskInProgress(int taskId) throws IOException {
-        int id = findTask(taskId);
-
-        if (id == -1) {
-            return false;
-        } else {
-            List<Task> list = new ArrayList<>(tasks);
-            Task task = new Task(list.get(id).getId(), list.get(id).getTitle(), list.get(id).getStatus());
-            task.setStatus(TaskStatus.IN_PROGRESS);
-            list.set(id, task);
-            taskRepository.saveTasks(list);
-            tasks.set(id, task);
-
-            return true;
-        }
+    public boolean updateStatus(int taskId, TaskStatus status) throws IOException {
+        return update(taskId, null, status);
     }
 
     public boolean updateTask(int taskId, String title) throws IOException {
-        int id = findTask(taskId);
-
-        if (id == -1) {
-            return false;
-        } else {
-            List<Task> list = new ArrayList<>(tasks);
-            Task task = new Task(list.get(id).getId(), list.get(id).getTitle(), list.get(id).getStatus());
-            task.setTitle(title);
-            list.set(id, task);
-            taskRepository.saveTasks(list);
-            tasks.set(id, task);
-
-            return true;
-        }
+        return update(taskId, title, null);
     }
 
     public boolean deleteTask(int taskId) throws IOException {
@@ -122,5 +80,33 @@ public class TaskService {
         }
 
         return -1;
+    }
+
+    private boolean update(int taskId, String taskTitle, TaskStatus taskStatus) throws IOException {
+        int id = findTask(taskId);
+
+        if (id == -1) {
+            return false;
+        } else {
+            List<Task> list = new ArrayList<>(tasks);
+            String title = taskTitle != null ? taskTitle : list.get(id).getTitle();
+            TaskStatus status = taskStatus != null ? taskStatus : list.get(id).getStatus();
+
+            validateTitle(title);
+
+            Task task = new Task(taskId, title, status);
+
+            list.set(id, task);
+            taskRepository.saveTasks(list);
+            tasks.set(id, task);
+
+            return true;
+        }
+    }
+
+    private void validateTitle(String title) {
+        if (title.trim().isEmpty() || title.trim().equals("null")) {
+            throw new IllegalArgumentException("Title can't be empty or null.");
+        }
     }
 }

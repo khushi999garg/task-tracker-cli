@@ -27,6 +27,8 @@ public class App {
                     try {
                         task = taskService.addTask(args[1]);
                         System.out.println("Task added: " + task.getTitle() + " (ID: " + task.getId() + ")");
+                    } catch (IllegalArgumentException e) {
+                        System.out.println(e.getMessage());
                     } catch (IOException e) {
                         System.out.println("Error adding tasks: " + e.getMessage());
                         return;
@@ -55,7 +57,7 @@ public class App {
                     System.out.println("Usage: task mark-done <id>");
                 } else {
                     try {
-                        if (taskService.markTaskDone(Integer.parseInt(args[1])))
+                        if (taskService.updateStatus(Integer.parseInt(args[1]), TaskStatus.DONE))
                             System.out.println("Task updated: " + TaskStatus.DONE);
                         else
                             System.out.println("Task not found");
@@ -72,7 +74,7 @@ public class App {
                     System.out.println("Usage: task mark-in-progress <id>");
                 } else {
                     try {
-                        if (taskService.markTaskInProgress(Integer.parseInt(args[1])))
+                        if (taskService.updateStatus(Integer.parseInt(args[1]), TaskStatus.IN_PROGRESS))
                             System.out.println("Task updated: " + TaskStatus.IN_PROGRESS);
                         else
                             System.out.println("Task not found");
@@ -112,6 +114,8 @@ public class App {
                             System.out.println("Task not found.");
                     } catch (NumberFormatException e) {
                         System.out.println("Invalid input format. Please enter an integer as ID");
+                    } catch (IllegalArgumentException e) {
+                        System.out.println(e.getMessage());
                     } catch (IOException e) {
                         System.out.println("Error updating task: " + e.getMessage());
                     }
