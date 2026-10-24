@@ -46,7 +46,7 @@ public class App {
                 }
                 break;
 
-            case "done":
+            case "mark-done":
                 if (args.length < 2) {
                     System.out.println("Usage: task done <id>");
                 } else {

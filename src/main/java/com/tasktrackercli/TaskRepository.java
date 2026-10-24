@@ -155,7 +155,6 @@ public class TaskRepository {
 
         sb.append("]");
 
-        // Path filePath = Path.of("tasks.json");
         File file = new File("tasks.json.tmp");
 
         try (FileWriter writer = new FileWriter(file)) {
@@ -169,7 +168,93 @@ public class TaskRepository {
             Files.move(src, dest, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
         } finally {
             try {
-                Files.deleteIfExists((src));
+                Files.deleteIfExists(src);
+            } catch (IOException e) {
+                System.out.println("Warning: Could not delete temporary file: " + e.getMessage());
+            }
+        }
+    }
+
+    public int loadNextId() throws IOException {
+        File file = new File("task-metadata.json");
+        // StringBuilder sb = new StringBuilder();
+
+        if (!file.exists()) {
+            file.createNewFile();
+            try (FileWriter writer = new FileWriter(file)) {
+                // sb.append("{}");
+                writer.write("{}");
+            }
+
+            return -1;
+        }
+
+        Path filePath = Path.of("task-metadata.json");
+        String content = Files.readString(filePath);
+
+        if (content.trim().equals("{}") ||content.trim().isEmpty()) {
+            return -1;
+        }
+
+        int objectStart = content.indexOf("{");
+
+        int objectEnd = content.indexOf("}", objectStart);
+
+        if (objectEnd == -1) {
+            throw new IOException("Invalid JSON: missing closing brace");
+        }
+
+        // String object = content.substring(objectStart, objectEnd + 1);
+
+        int nextIdIndex = content.indexOf("\"nextId\"");
+
+        if (nextIdIndex == -1) {
+            throw new IOException("Invalid JSON: missing next id");
+        }
+
+        int nextIdColonIndex = content.indexOf(":", nextIdIndex);
+
+        if (nextIdColonIndex == -1) {
+            throw new IOException("Invalid JSON");
+        }
+
+        int nextId;
+
+        try {
+            nextId = Integer.parseInt(content.substring(nextIdColonIndex + 1,
+                    objectEnd).trim());
+        } catch (NumberFormatException e) {
+            throw new IOException("Invalid JSON: task id must be an integer");
+        }
+
+        if (nextId < 1) {
+            throw new IOException("Invalid nextID in JSON");
+        }
+
+        return nextId;
+    }
+
+    public void saveNextId(int id) throws IOException {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("{\n\"nextId\": ");
+        sb.append(String.valueOf(id));
+        sb.append("\n}");
+
+        File file = new File("task-metadata.json.temp");
+
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.write(sb.toString());
+        }
+
+        Path src = Path.of("task-metadata.json.temp");
+        Path dest = Path.of("task-metadata.json");
+
+        try {
+            Files.move(src, dest, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        } finally {
+            try {
+                Files.deleteIfExists(src);
             } catch (IOException e) {
                 System.out.println("Warning: Could not delete temporary file: " + e.getMessage());
             }

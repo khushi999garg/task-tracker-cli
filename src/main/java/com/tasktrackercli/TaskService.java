@@ -21,6 +21,7 @@ public class TaskService {
         taskRepository.saveTasks(list);
         tasks.add(task);
         id++;
+        taskRepository.saveNextId(id);
         return task;
     }
 
@@ -60,12 +61,19 @@ public class TaskService {
         return tasks;
     }
 
-    private void initializeNextId() {
+    private void initializeNextId() throws IOException{
         for (Task task : tasks) {
             id = Math.max(id, task.getId());
         }
 
         id++;
+
+        int nextId = taskRepository.loadNextId();
+
+        if (nextId != -1 && nextId >= id){
+            id = nextId;
+        }
+        taskRepository.saveNextId(id);
     }
 
     private int findTask(int taskId) {
