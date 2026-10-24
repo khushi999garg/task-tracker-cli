@@ -41,6 +41,21 @@ public class TaskService {
         }
     }
 
+    public boolean deleteTask(int taskId) throws IOException {
+        int id = findTask(taskId);
+
+        if (id == -1) {
+            return false;
+        } else {
+            List<Task> list = new ArrayList<>(tasks);
+            list.remove(id);
+            taskRepository.saveTasks(list);
+            tasks.remove(id);
+
+            return true;
+        }
+    }
+
     public List<Task> listTasks() {
         return tasks;
     }
