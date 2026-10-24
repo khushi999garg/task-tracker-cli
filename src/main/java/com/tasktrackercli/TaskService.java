@@ -14,7 +14,7 @@ public class TaskService {
         initializeNextId();
     }
 
-    public Task addTask(String title) throws IOException{
+    public Task addTask(String title) throws IOException {
         List<Task> list = new ArrayList<>(tasks);
         Task task = new Task(id, title);
         list.add(task);
@@ -22,6 +22,23 @@ public class TaskService {
         tasks.add(task);
         id++;
         return task;
+    }
+
+    public boolean markTaskDone(int taskId) throws IOException {
+        int id = findTask(taskId);
+
+        if (id == -1) {
+            return false;
+        } else {
+            List<Task> list = new ArrayList<>(tasks);
+            Task task = new Task(list.get(id).getId(), list.get(id).getTitle(), list.get(id).getStatus());
+            task.setStatus(TaskStatus.DONE);
+            list.set(id, task);
+            taskRepository.saveTasks(list);
+            tasks.set(id, task);
+
+            return true;
+        }
     }
 
     public List<Task> listTasks() {
@@ -34,5 +51,15 @@ public class TaskService {
         }
 
         id++;
+    }
+
+    private int findTask(int taskId) {
+        for (int i = 0; i < tasks.size(); i++) {
+            if (tasks.get(i).getId() == taskId) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 }
