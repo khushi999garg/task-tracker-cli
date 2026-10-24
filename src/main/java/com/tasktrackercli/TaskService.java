@@ -21,7 +21,11 @@ public class TaskService {
         taskRepository.saveTasks(list);
         tasks.add(task);
         id++;
-        taskRepository.saveNextId(id);
+        try {
+            taskRepository.saveNextId(id);
+        } catch (IOException e) {
+            System.out.println("Couldn't update nextID. " + e.getMessage());
+        }
         return task;
     }
 
@@ -61,7 +65,7 @@ public class TaskService {
         return tasks;
     }
 
-    private void initializeNextId() throws IOException{
+    private void initializeNextId() throws IOException {
         for (Task task : tasks) {
             id = Math.max(id, task.getId());
         }
@@ -70,7 +74,7 @@ public class TaskService {
 
         int nextId = taskRepository.loadNextId();
 
-        if (nextId != -1 && nextId >= id){
+        if (nextId != -1 && nextId >= id) {
             id = nextId;
         }
         taskRepository.saveNextId(id);
