@@ -1,6 +1,8 @@
 package com.tasktrackercli;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class App {
     public static void main(String[] args) {
@@ -37,17 +39,36 @@ public class App {
                 break;
 
             case "list":
-                if (args.length != 1) {
-                    System.out.println("Usage: task list");
+                List<Task> tasks = new ArrayList<>();
+                if (args.length > 2) {
+                    System.out.println("Usage: task list [status]");
+                    break;
                 } else {
-                    if (taskService.listTasks().isEmpty()) {
-                        System.out.println("No tasks found.");
-                    } else {
-                        String format = "%-5s %-25s %-10s%n";
-                        System.out.format(format, "ID", "TITLE", "STATUS");
-                        for (Task task : taskService.listTasks()) {
-                            System.out.format(format, task.getId(), task.getTitle(), task.getStatus());
+                    if (args.length == 1) {
+                        tasks = taskService.listTasks();
+                        if (tasks.isEmpty()) {
+                            System.out.println("No tasks found.");
+                            break;
                         }
+
+                    } else if (args.length == 2) {
+                        try {
+                            tasks = taskService.listTasks(TaskStatus.valueOf(args[1]));
+                            if (tasks.isEmpty()) {
+                                System.out.println("No tasks found.");
+                                break;
+                            }
+                        } catch (IllegalArgumentException e) {
+                            System.out.println("Invalid Input error: " + e.getMessage());
+                            break;
+                        }
+
+                    }
+
+                    String format = "%-5s %-25s %-10s%n";
+                    System.out.format(format, "ID", "TITLE", "STATUS");
+                    for (Task task : tasks) {
+                        System.out.format(format, task.getId(), task.getTitle(), task.getStatus());
                     }
                 }
                 break;

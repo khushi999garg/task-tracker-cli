@@ -57,6 +57,18 @@ public class TaskService {
         return tasks;
     }
 
+    public List<Task> listTasks(TaskStatus status) {
+        List<Task> list = new ArrayList<>();
+
+        for (Task task : tasks) {
+            if (task.getStatus() == status) {
+                list.add(task);
+            }
+        }
+
+        return list;
+    }
+
     private void initializeNextId() throws IOException {
         for (Task task : tasks) {
             id = Math.max(id, task.getId());
