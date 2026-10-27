@@ -1,6 +1,7 @@
 package com.tasktrackercli;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -109,10 +110,12 @@ public class TaskService {
             List<Task> list = new ArrayList<>(tasks);
             String title = taskTitle != null ? taskTitle : list.get(id).getTitle();
             TaskStatus status = taskStatus != null ? taskStatus : list.get(id).getStatus();
+            LocalDateTime createdAt = list.get(id).getCreatedAt();
+            LocalDateTime updatedAt = LocalDateTime.now();
 
             validateTitle(title);
 
-            Task task = new Task(taskId, title, status);
+            Task task = new Task(taskId, title, status, createdAt, updatedAt);
 
             list.set(id, task);
             taskRepository.saveTasks(list);

@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -123,7 +125,70 @@ public class TaskRepository {
             } catch (IllegalArgumentException e) {
                 throw new IOException("Invalid JSON: unknown task status");
             }
-            Task task = new Task(id, title, status);
+
+            int createdAtIndex = taskJson.indexOf("\"createdAt\"");
+
+            if (createdAtIndex == -1) {
+                throw new  IOException("Invalid JSON: missing task createdAt");
+            }
+
+            int createdAtColonIndex = taskJson.indexOf(":", createdAtIndex);
+
+            if (createdAtColonIndex == -1) {
+                throw new IOException("Invalid JSON: malformed task createdAt");
+            }
+
+            int createdAtStart = taskJson.indexOf("\"", createdAtColonIndex);
+
+            if(createdAtStart == -1) {
+                throw new IOException("Invalid JSON: malformed task createdAt");
+            }
+
+            int createdAtEnd = taskJson.indexOf("\"", createdAtStart + 1);
+
+            if (createdAtEnd == -1) {
+                throw new IOException("Invalid JSON: malformed task createdAt");
+            }
+
+            LocalDateTime createdAt;
+            try {
+                createdAt = LocalDateTime.parse(taskJson.substring(createdAtStart + 1, createdAtEnd));
+            } catch (DateTimeParseException e) {
+                throw new IOException("Invalid JSON: malformed task createdAt");
+            }
+
+            int updatedAtIndex = taskJson.indexOf("\"updatedAt\"");
+
+            if(updatedAtIndex == -1) {
+                throw new IOException("Invalid JSON: missing task updatedAt");
+            }
+
+            int updatedAtColonindex = taskJson.indexOf(":", updatedAtIndex);
+
+            if(updatedAtColonindex == -1) {
+                throw new IOException("Invalid JSON: malformed task updatedAt");
+            }
+
+            int updatedAtStart = taskJson.indexOf("\"", updatedAtColonindex);
+
+            if (updatedAtStart == -1) {
+                throw new IOException("Invalid JSON: malformed task updatedAt");
+            }
+
+            int updatedAtEnd = taskJson.indexOf("\"", updatedAtStart + 1);
+
+            if (updatedAtEnd == -1) {
+                throw new IOException("Invalid JSON: malformed task updatedAt");
+            }
+
+            LocalDateTime updatedAt;
+            try {
+                updatedAt = LocalDateTime.parse(taskJson.substring(updatedAtStart + 1, updatedAtEnd));
+            } catch (DateTimeParseException e) {
+                throw new IOException("Invalid JSON: malformed task updatedAt");
+            }
+
+            Task task = new Task(id, title, status, createdAt, updatedAt);
             tasks.add(task);
 
             objectStart = content.indexOf("{", objectEnd + 1);
@@ -149,6 +214,10 @@ public class TaskRepository {
             sb.append(escapeJson(task.getTitle()));
             sb.append("\", \"status\": \"");
             sb.append(task.getStatus());
+            sb.append("\", \"createdAt\": \"");
+            sb.append(task.getCreatedAt());
+            sb.append("\", \"updatedAt\": \"");
+            sb.append(task.getUpdatedAt());
             sb.append("\"}");
             i++;
         }

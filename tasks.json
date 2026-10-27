@@ -1,8 +1,1 @@
-[{"id": 2, "title": "Learn \"Java\"", "status": "IN_PROGRESS"},
-{"id": 4, "title": "C:\\Users\\Java", "status": "IN_PROGRESS"},
-{"id": 5, "title": "Learn Java\nPractice Java", "status": "TODO"},
-{"id": 6, "title": "Practice Java", "status": "TODO"},
-{"id": 7, "title": "Atomic write test", "status": "TODO"},
-{"id": 8, "title": "Atomic write test", "status": "TODO"},
-{"id": 10, "title": "TEST", "status": "TODO"},
-{"id": 12, "title": "TEST", "status": "TODO"}]
+[{"id": 1, "title": "Design architecture of Task Tracker CLI", "status": "TODO", "createdAt": "2026-10-27T23:57:24.635149600", "updatedAt": "2026-10-28T00:01:08.075615800"}]
