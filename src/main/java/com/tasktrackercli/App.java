@@ -53,7 +53,11 @@ public class App {
 
                     } else if (args.length == 2) {
                         try {
-                            tasks = taskService.listTasks(TaskStatus.valueOf(args[1]));
+                            if (args[1].equals("NOT_DONE")) {
+                                tasks = taskService.listTasks(TaskStatus.DONE, false);
+                            } else {
+                                tasks = taskService.listTasks(TaskStatus.valueOf(args[1]), true);
+                            }
                             if (tasks.isEmpty()) {
                                 System.out.println("No tasks found.");
                                 break;

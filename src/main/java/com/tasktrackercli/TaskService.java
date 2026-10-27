@@ -57,12 +57,18 @@ public class TaskService {
         return tasks;
     }
 
-    public List<Task> listTasks(TaskStatus status) {
+    public List<Task> listTasks(TaskStatus status, boolean include) {
         List<Task> list = new ArrayList<>();
 
         for (Task task : tasks) {
-            if (task.getStatus() == status) {
-                list.add(task);
+            if (include) {
+                if (task.getStatus() == status) {
+                    list.add(task);
+                }
+            } else {
+                if (task.getStatus() != status){
+                    list.add(task);
+                }
             }
         }
 
