@@ -1,6 +1,7 @@
 package com.tasktrackercli;
 
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,10 +70,14 @@ public class App {
 
                     }
 
-                    String format = "%-5s %-25s %-10s%n";
-                    System.out.format(format, "ID", "TITLE", "STATUS");
+                    String format = "%-5s %-25s %-10s %-25s %-25s%n";
+                    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+                    System.out.format(format, "ID", "TITLE", "STATUS", "CREATED_AT", "UPDATED_AT");
                     for (Task task : tasks) {
-                        System.out.format(format, task.getId(), task.getTitle(), task.getStatus());
+                        System.out.format(format, task.getId(), task.getTitle(), task.getStatus(),
+                                dateTimeFormatter.format(task.getCreatedAt()),
+                                dateTimeFormatter.format(task.getUpdatedAt()));
                     }
                 }
                 break;
