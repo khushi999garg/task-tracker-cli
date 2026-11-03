@@ -87,12 +87,14 @@ public class App {
                     System.out.println("Usage: task mark-done <id>");
                 } else {
                     try {
-                        if (taskService.updateStatus(Integer.parseInt(args[1]), TaskStatus.DONE))
+                        if (taskService.updateStatus(parsePositiveId(args[1]), TaskStatus.DONE))
                             System.out.println("Task updated: " + TaskStatus.DONE);
                         else
                             System.out.println("Task not found");
                     } catch (NumberFormatException e) {
                         System.out.println("Invalid input format. Please enter an integer");
+                    } catch (IllegalArgumentException e) {
+                        System.out.println(e.getMessage());
                     } catch (IOException e) {
                         System.out.println("Error updating task: " + e.getMessage());
                     }
@@ -104,12 +106,14 @@ public class App {
                     System.out.println("Usage: task mark-in-progress <id>");
                 } else {
                     try {
-                        if (taskService.updateStatus(Integer.parseInt(args[1]), TaskStatus.IN_PROGRESS))
+                        if (taskService.updateStatus(parsePositiveId(args[1]), TaskStatus.IN_PROGRESS))
                             System.out.println("Task updated: " + TaskStatus.IN_PROGRESS);
                         else
                             System.out.println("Task not found");
                     } catch (NumberFormatException e) {
                         System.out.println("Invalid input format. Please enter an integer");
+                    } catch (IllegalArgumentException e) {
+                        System.out.println(e.getMessage());
                     } catch (IOException e) {
                         System.out.println("Error updating task: " + e.getMessage());
                     }
@@ -121,12 +125,14 @@ public class App {
                     System.out.println("Usage: task delete <id>");
                 } else {
                     try {
-                        if (taskService.deleteTask(Integer.parseInt(args[1])))
+                        if (taskService.deleteTask(parsePositiveId(args[1])))
                             System.out.println("Task deleted successfully");
                         else
                             System.out.println("Task not found.");
                     } catch (NumberFormatException e) {
                         System.out.println("Invalid input format. Please enter an integer");
+                    } catch (IllegalArgumentException e) {
+                        System.out.println(e.getMessage());
                     } catch (IOException e) {
                         System.out.println("Error deleting tasks: " + e.getMessage());
                     }
@@ -138,7 +144,7 @@ public class App {
                     System.out.println("Usage: task update <id> \"task title\"");
                 } else {
                     try {
-                        if (taskService.updateTask(Integer.parseInt(args[1]), args[2]))
+                        if (taskService.updateTask(parsePositiveId(args[1]), args[2]))
                             System.out.println("Task updated successfully.");
                         else
                             System.out.println("Task not found.");
@@ -157,4 +163,14 @@ public class App {
                 break;
         }
     }
+
+    static int parsePositiveId(String id) throws NumberFormatException {
+        int a = Integer.parseInt(id);
+
+        if (a < 1)
+            throw new IllegalArgumentException("Invalid ID: must be greater than 0.");
+
+        return a;
+    }
+
 }
