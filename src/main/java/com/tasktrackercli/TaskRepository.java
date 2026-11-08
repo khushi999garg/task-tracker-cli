@@ -24,10 +24,18 @@ public class TaskRepository {
         }
 
         Path filePath = Path.of("tasks.json");
-        String content = Files.readString(filePath);
+        String content = Files.readString(filePath).trim();
 
-        if (content.trim().equals("[]") || content.trim().isEmpty()) {
+        if (content.equals("[]") || content.isEmpty()) {
             return new ArrayList<>();
+        }
+
+        if(!content.startsWith("[")) {
+            throw new IOException("Invalid JSON: malformed list format");
+        }
+
+        if (!content.endsWith("]")) {
+            throw new IOException("Invalid JSON: malformed list format");
         }
 
         List<Task> tasks = new ArrayList<>();
